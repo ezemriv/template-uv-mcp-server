@@ -158,6 +158,49 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[dict]:
 mcp = FastMCP("My App", lifespan=app_lifespan)
 ```
 
+## Testing
+
+### Running Tests
+
+```bash
+# Run all tests
+uv run pytest
+
+# Run with verbose output
+uv run pytest -v
+
+# Run specific test file
+uv run pytest tests/test_server.py
+
+# Run specific test class or function
+uv run pytest tests/test_server.py::TestTools::test_hello_tool_default
+```
+
+### Testing Pattern
+
+Tests use in-memory transport via `create_connected_server_and_client_session` from `mcp.shared.memory`:
+
+```python
+import pytest
+from mcp.shared.memory import create_connected_server_and_client_session
+from template_uv_mcp_server.server import mcp
+
+@pytest.mark.asyncio
+async def test_my_tool():
+    async with create_connected_server_and_client_session(
+        mcp, raise_exceptions=True
+    ) as session:
+        result = await session.call_tool("my_tool", arguments={"param": "value"})
+        assert result.content[0].text == "expected"
+```
+
+Key points:
+- Each test creates its own session (avoids event loop issues with fixtures)
+- Use `raise_exceptions=True` to surface server errors in tests
+- Test tools via `session.call_tool()`
+- Test resources via `session.read_resource()` and `session.list_resources()`
+- Test prompts via `session.get_prompt()` and `session.list_prompts()`
+
 ## Transport Options
 
 - **stdio** (default): Used by Claude Desktop and most clients
