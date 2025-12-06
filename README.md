@@ -105,7 +105,7 @@ Edit your Claude Desktop configuration file and add:
 {
   "mcpServers": {
     "template-server": {
-      "command": "uv",
+      "command": "/Users/youruser/.local/bin/uv",
       "args": [
         "--directory",
         "/path/to/template-uv-mcp-server",
@@ -117,7 +117,17 @@ Edit your Claude Desktop configuration file and add:
 }
 ```
 
-Replace `/path/to/template-uv-mcp-server` with the actual path to your project.
+**Important:** Replace both paths:
+- `/Users/youruser/.local/bin/uv` → Full path to your `uv` binary
+- `/path/to/template-uv-mcp-server` → Full path to this project
+
+**Finding your `uv` path:**
+```bash
+which uv
+# Example output: /Users/youruser/.local/bin/uv
+```
+
+> **Why the full path?** Claude Desktop is a GUI application that doesn't inherit your shell's PATH environment variable. Using just `"command": "uv"` will fail because Claude Desktop can't find the binary. Always use the absolute path returned by `which uv`.
 
 ### Option 2: Using the MCP CLI
 
